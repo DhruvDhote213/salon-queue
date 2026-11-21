@@ -1,6 +1,6 @@
 # Salon Queue Management System
 
-**Live demo:** https://YOUR-PROJECT.vercel.app
+**Live demo:** https://salon-queue-frontend.vercel.app/#home
 **Hosted on:** Vercel (frontend) + Render (backend) + Supabase (PostgreSQL)
 
 ## About
