@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Salon Queue</title>
+<style>
+:root{--bg:#1F2937;--card:#2b3646;--gold:#D4A017;--tx:#f3f4f6;--mu:#9ca3af;--rd:#ef4444;--am:#f59e0b;--gr:#22c55e;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+nav{display:flex;gap:6px;overflow-x:auto;padding:8px;background:#161d28;position:sticky;top:0;z-index:5}
+nav a,nav button{color:var(--mu);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:999px;border:1px solid #374151;background:none;white-space:nowrap;min-height:44px;display:flex;align-items:center;cursor:pointer}
+nav a.on{color:#111;background:var(--gold);border-color:var(--gold)}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1,h2,h3{margin:.2em 0 .5em}h1{color:var(--gold)}
+.card{background:var(--card);border-radius:16px;padding:14px;margin:10px 0}
+.btn{background:var(--gold);color:#111;border:0;border-radius:14px;font-weight:700;font-size:17px;padding:14px 20px;min-height:48px;cursor:pointer}
+.btn.g{background:#374151;color:var(--tx)}.btn.r{background:var(--rd);color:#fff}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.s{font-size:14px;padding:8px 12px;min-height:44px}
+.chip{display:inline-block;padding:6px 12px;border-radius:999px;background:#374151;margin:3px;font-size:14px}
+.free{color:var(--gr)}.busy{color:var(--am)}.brk{color:var(--mu)}
+input[type=text],input[type=tel],select{width:100%;padding:12px;border-radius:10px;border:1px solid #4b5563;background:#111827;color:var(--tx);font-size:16px;margin:4px 0 10px}
+.sel{border:2px solid #4b5563;border-radius:12px;padding:10px;margin:6px 0;cursor:pointer;display:flex;justify-content:space-between}
+.sel.on{border-color:var(--gold);background:#3a3420}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.amber{border-left:5px solid var(--am)}.big{font-size:64px;font-weight:800;color:var(--gold);text-align:center}
+.turn{position:fixed;inset:0;background:var(--gold);color:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:34px;font-weight:800;animation:p 1.2s infinite;z-index:9}
+@keyframes p{50%{filter:brightness(1.15)}}
+.tv{font-size:26px}.flash{animation:p .8s infinite;outline:3px solid var(--gold)}
+.mu{color:var(--mu)}.ban{background:#3a3420;border:1px solid var(--gold);border-radius:12px;padding:12px;text-align:center}
+</style></head><body>
+<nav id="nav"></nav><main id="app"></main>
+<script>window.API_URL=(location.protocol==="file:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")?"http://localhost:3000":"https://YOUR-API.onrender.com";</script>
+<script>
+const L={en:{home:"Home",join:"Join Queue",reception:"Reception",barber:"Barber",tv:"TV",admin:"Owner",open:"Open",closed:"Queue closed",wait:"waiting",min:"min",name:"Name",phone:"Phone (10 digits)",svc:"Services (max 3)",any:"Any barber (fastest)",confirm:"Confirm",pos:"in line",next:"Call next",noshow:"No-show",cancel:"Cancel",walk:"+ Add walk-in",start:"Start",done:"Done",brk:"On break",avail:"Available",turn:"It’s your turn!",soon:"Start coming to the salon",empty:"No one waiting — walk right in!",cancelq:"Cancel my spot?",dup:"You already have a spot — showing it.",bad:"Enter a name and a 10-digit phone, and pick 1–3 services.",up:"Up next",stats:"Today",served:"Served",avgw:"Avg wait",ns:"No-shows",onoff:"Online joining",qclosed:"Online joining is closed. Please walk in.",brkmsg:"is on break"},
+gu:{home:"હોમ",join:"કતારમાં જોડાઓ",reception:"રિસેપ્શન",barber:"બાર્બર",tv:"ટીવી",admin:"માલિક",open:"ખુલ્લું",closed:"કતાર બંધ",wait:"રાહ જોઈ રહ્યા",min:"મિનિટ",name:"નામ",phone:"ફોન (10 અંક)",svc:"સેવાઓ (વધુમાં વધુ 3)",any:"કોઈપણ બાર્બર (ઝડપી)",confirm:"પુષ્ટિ કરો",pos:"લાઇનમાં",next:"આગળનો બોલાવો",noshow:"આવ્યા નહીં",cancel:"રદ કરો",walk:"+ વોક-ઇન ઉમેરો",start:"શરૂ",done:"પૂર્ણ",brk:"બ્રેક પર",avail:"ઉપલબ્ધ",turn:"તમારો વારો છે!",soon:"સલૂન તરફ આવવાનું શરૂ કરો",empty:"કોઈ રાહ જોતું નથી — સીધા આવો!",cancelq:"તમારી જગ્યા રદ કરવી છે?",dup:"તમારી જગ્યા પહેલેથી છે.",bad:"નામ, 10 અંકનો ફોન અને 1–3 સેવાઓ પસંદ કરો.",up:"હવે પછી",stats:"આજે",served:"પૂર્ણ થયા",avgw:"સરેરાશ રાહ",ns:"આવ્યા નહીં",onoff:"ઓનલાઇન જોડાણ",qclosed:"ઓનલાઇન જોડાણ બંધ છે. સીધા આવો.",brkmsg:"બ્રેક પર છે"}};
+let lang="en";const t=k=>L[lang][k]||k;
+const now=()=>Date.now(),M=60000;
+const seed=()=>({tok:4,open:true,stat:{served:0,wsum:0,ns:0},
+ barbers:[{n:"Ravi",s:"free"},{n:"Amit",s:"free"},{n:"Imran",s:"free"}],
+ services:[{id:1,en:"Haircut",gu:"હેરકટ",m:30,p:150,on:1},{id:2,en:"Beard trim",gu:"દાઢી ટ્રીમ",m:15,p:80,on:1},{id:3,en:"Hair spa",gu:"હેર સ્પા",m:45,p:400,on:1}],
+ q:[{id:1,tok:1,name:"Kunal",phone:"9000000001",svc:[1],b:"Any",st:"w",t:now()-70*M},{id:2,tok:2,name:"Meera",phone:"9000000002",svc:[1,2],b:"Ravi",st:"w",t:now()-40*M},{id:3,tok:3,name:"Jay",phone:"9000000003",svc:[3],b:"Any",st:"w",t:now()-15*M}]});
+const API=(window.API_URL||"").replace(/\/$/,"");let S=seed();
+async function act(op,a={}){try{const r=await fetch(API+"/api/action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,...a})});const j=await r.json();if(j.state)S=j.state;if(j.error)alert(j.error);render();return j}catch(e){alert("Server unreachable")}}
+async function pull(){try{const r=await fetch(API+"/api/state");S=await r.json();const el=document.activeElement;if(route()!="join"&&!(el&&el.matches("input,select")))render()}catch(e){}}
+const save=()=>render();
+const sv=id=>S.services.find(s=>s.id==id),tot=c=>c.svc.reduce((a,i)=>a+sv(i).m,0),cost=c=>c.svc.reduce((a,i)=>a+sv(i).p,0);
+const W=()=>S.q.filter(c=>c.st=="w"),work=()=>S.barbers.filter(b=>b.s=="free").length||1;
+const wait=c=>{let a=0;for(const x of W()){if(x.id==c.id)break;a+=tot(x)}return Math.round(a/work())};
+const find=id=>S.q.find(c=>c.id==id),mine=n=>S.q.find(c=>c.st!="x"&&["called","chair"].includes(c.st)&&c.b==n||c.st!="x"&&["called","chair"].includes(c.st)&&c.at==n);
+const cur=n=>S.q.find(c=>["called","chair"].includes(c.st)&&c.at==n);
+const active=p=>S.q.find(c=>c.phone==p&&["w","called","chair"].includes(c.st));
+function add(name,phone,svc,b){const e=active(phone);if(e)return e;S.tok++;const c={id:now(),tok:S.tok,name,phone,svc,b,st:"w",t:now()};S.q.push(c);return c}
+const callNext=n=>act("call",{n});
+const go=h=>{location.hash=h};
+const route=()=>(location.hash||"#home").slice(1);
+let J={svc:[],b:"Any"},msg="";
+function nav(){const r=route().split("-")[0];const items=[["home","home"],["join","join"],["reception","reception"],["barber-ravi","barber"],["display","tv"],["admin","admin"]];
+ document.getElementById("nav").innerHTML=items.map(([h,k])=>`<a href="#${h}" class="${h.split("-")[0]==r?"on":""}">${t(k)}</a>`).join("")+`<button onclick="lang=lang=='en'?'gu':'en';render()">EN / ગુ</button>`}
+const nm=s=>lang=="gu"?s.gu:s.en;
+const bch=b=>`<span class="chip">${b.n} <span class="${b.s=="free"?(cur(b.n)?"busy":"free"):"brk"}">● ${b.s=="off"?"off":b.s=="break"?t("brk"):cur(b.n)?"busy":"free"}</span></span>`;
+function home(){const w=W(),m=w.reduce((a,c)=>a+tot(c),0);return `<h1>✂ Gold Cut Salon</h1><div class="card row"><span class="chip">${S.open?"● "+t("open")+" · 9 PM":t("closed")}</span></div>
+<div class="card"><h2>${w.length} ${t("wait")} · ~${Math.round(m/work())} ${t("min")}</h2>${S.barbers.map(bch).join("")}</div>
+<button class="btn" style="width:100%" onclick="go('join')" ${S.open?"":"disabled"}>${t("join")}</button>${S.open?"":`<p class="mu">${t("qclosed")}</p>`}`}
+function sum(){const s=J.svc.map(sv),m=s.reduce((a,x)=>a+x.m,0),p=s.reduce((a,x)=>a+x.p,0);const a=W().reduce((x,c)=>x+tot(c),0);return `Total ${m} ${t("min")} · ₹${p} · ~${Math.round(a/work())} ${t("min")}`}
+function joinV(){if(!S.open)return `<h1>${t("join")}</h1><div class="ban">${t("qclosed")}</div>`;
+ return `<h1>${t("join")}</h1><div class="card"><label>${t("name")}</label><input type="text" id="jn"><label>${t("phone")}</label><input type="tel" id="jp" maxlength="10" inputmode="numeric">
+<label>${t("svc")}</label>${svcPick()}<label>${t("any")}</label><select id="jb" onchange="J.b=this.value"><option value="Any">${t("any")}</option>${S.barbers.filter(b=>b.s!="off").map(b=>`<option ${J.b==b.n?"selected":""}>${b.n}</option>`).join("")}</select>
+<div class="ban" id="js">${sum()}</div><p id="je" style="color:var(--rd)">${msg}</p><button class="btn" style="width:100%" onclick="doJoin()">${t("confirm")}</button></div>`}
+const svcPick=()=>S.services.filter(s=>s.on).map(s=>`<div class="sel ${J.svc.includes(s.id)?"on":""}" onclick="tg(${s.id},this)"><span>${nm(s)} · ${s.m} ${t("min")}</span><b>₹${s.p}</b></div>`).join("");
+function tg(id,el){const i=J.svc.indexOf(id);if(i>=0)J.svc.splice(i,1);else if(J.svc.length<3)J.svc.push(id);el.parentElement.querySelectorAll(".sel").forEach((e,k)=>e.classList.toggle("on",J.svc.includes(S.services.filter(s=>s.on)[k].id)));document.getElementById("js").textContent=sum()}
+function doJoin(){const n=jn.value.trim(),p=jp.value.trim();if(!n||!/^\d{10}$/.test(p)||!J.svc.length){document.getElementById("je").textContent=t("bad");return}act("join",{name:n,phone:p,svc:[...J.svc],b:jb.value}).then(j=>{if(j&&j.c){J={svc:[],b:"Any"};go("status-"+j.c.id)}})}
+function status(id){const c=find(id);if(!c)return `<p>Not found.</p>`;
+ if(c.st=="called")return `<div class="turn"><div>${t("turn")}</div><div>→ ${c.at}</div><div style="font-size:20px">S-${c.tok}</div></div>`;
+ if(c.st=="chair")return `<div class="card"><h2>S-${c.tok}</h2><p>With ${c.at} ✂</p></div>`;
+ if(c.st!="w")return `<div class="card"><h2>S-${c.tok}</h2><p>${c.st=="done"?"Thank you!":c.st=="x"?"Cancelled":"No-show"}</p></div>`;
+ const pos=W().findIndex(x=>x.id==c.id)+1,b=S.barbers.find(x=>x.n==c.b);
+ return `<div class="card"><div class="big">S-${c.tok}</div><h2 style="text-align:center">${pos}${["th","st","nd","rd"][pos%10<4&&(pos<11||pos>13)?pos%10:0]} ${t("pos")}</h2><h1 style="text-align:center">~${wait(c)} ${t("min")}</h1>
+ ${pos<=2?`<div class="ban">${t("soon")}</div>`:""}${b&&b.s=="break"?`<p class="mu">${b.n} ${t("brkmsg")}</p>`:""}<br><button class="btn r" style="width:100%" onclick="if(confirm(t('cancelq'))){act('cancel',{id:${c.id}})}">${t("cancel")}</button></div>`}
+function reception(){const w=W();
+ return `<div class="row"><h1>${t("reception")}</h1><button class="btn" onclick="document.getElementById('wf').hidden=!document.getElementById('wf').hidden">${t("walk")}</button></div>
+<div class="card" id="wf" hidden><input type="text" id="wn" placeholder="${t("name")}"><input type="tel" id="wp" maxlength="10" placeholder="${t("phone")}">${S.services.filter(s=>s.on).map(s=>`<label class="chip"><input type="checkbox" class="ws" value="${s.id}"> ${nm(s)}</label>`).join("")}<select id="wb"><option value="Any">${t("any")}</option>${S.barbers.map(b=>`<option>${b.n}</option>`).join("")}</select><button class="btn" onclick="walkin()">${t("confirm")}</button></div>
+<div class="grid">${S.barbers.map(b=>{const c=cur(b.n);return `<div class="card"><div class="row"><h3>${b.n}</h3>${bch(b)}</div>${c?`<p>S-${c.tok} ${c.name} · ${c.st}</p>${c.st=="called"?`<button class="btn s r" onclick="act('noshow',{id:${c.id}})">${t("noshow")}</button>`:""}`:`<p class="mu">—</p>`}<button class="btn s" ${b.s!="free"||c?"disabled":""} onclick="callNext('${b.n}')">${t("next")}</button></div>`}).join("")}</div>
+<h2>${w.length} ${t("wait")}</h2>${w.length?w.map(c=>{const m=Math.round((now()-c.t)/M);return `<div class="card row ${m>60?"amber":""}"><span><b>S-${c.tok}</b> ${c.name} · ${c.svc.map(i=>nm(sv(i))).join(", ")} · ${c.b} · ${m} ${t("min")}</span><button class="btn s g" onclick="act('cancel',{id:${c.id}})">${t("cancel")}</button></div>`}).join(""):`<p class="mu">${t("empty")}</p>`}`}
+function walkin(){const n=wn.value.trim(),p=wp.value.trim(),s=[...document.querySelectorAll(".ws:checked")].map(e=>+e.value);if(!n||!/^\d{10}$/.test(p)||!s.length||s.length>3){alert(t("bad"));return}act("join",{name:n,phone:p,svc:s,b:wb.value,walk:1})}
+function barber(n){const b=S.barbers.find(x=>x.n.toLowerCase()==n);if(!b)return "?";const c=cur(b.n),nx=W().find(x=>x.b=="Any"||x.b==b.n);
+ return `<h1>${b.n}</h1><div class="card">${c?`<h2>S-${c.tok} ${c.name}</h2><p>${c.svc.map(i=>nm(sv(i))).join(", ")}</p>${c.st=="chair"?`<p class="big" style="font-size:36px">⏱ ${Math.round((now()-c.sa)/M)} ${t("min")}</p><button class="btn" style="width:100%" onclick="fin('${b.n}')">${t("done")}</button>`:`<button class="btn" style="width:100%" onclick="act('start',{n:'${b.n}'})">${t("start")}</button>`}`:`<p class="mu">—</p>`}</div>
+ <p>${nx?`${t("next")}: S-${nx.tok} ${nx.name}`:t("empty")}</p><button class="btn g" onclick="act('brk',{n:'${b.n}',s:'${b.s=="break"?"free":"break"}'})">${b.s=="break"?t("avail"):t("brk")}</button>
+ <p>${S.barbers.map(x=>`<a class="chip" style="color:var(--tx)" href="#barber-${x.n.toLowerCase()}">${x.n}</a>`).join("")}</p>`}
+const fin=n=>act("done",{n});
+function display(){const up=W().slice(0,5);let a=0;return `<h1>✂ Gold Cut</h1><div class="tv">${S.barbers.map(b=>{const c=cur(b.n);return `<div class="card row ${c&&c.st=="called"?"flash":""}"><b>${b.n}</b><span>${b.s=="break"?t("brk"):c?"Now: S-"+c.tok:"—"}</span></div>`}).join("")}<h2>${t("up")}</h2>${up.map(c=>{const w=wait(c);return `<div class="card row"><b>S-${c.tok}</b><span>~${w} ${t("min")}</span></div>`}).join("")||`<p class="mu">${t("empty")}</p>`}</div>`}
+function admin(){const s=S.stat;return `<h1>${t("admin")}</h1><div class="card"><div class="row"><b>${t("onoff")}</b><button class="btn s" onclick="act('open',{v:${!S.open}})">${S.open?t("open"):t("closed")}</button></div></div>
+<div class="card"><h3>Services</h3>${S.services.map(x=>`<div class="row"><span>${nm(x)} · ${x.m} ${t("min")} · ₹${x.p}</span><button class="btn s ${x.on?"":"g"}" onclick="act('svc',{id:${x.id},on:${x.on?0:1}})">${x.on?"ON":"OFF"}</button></div>`).join("")}</div>
+<div class="card"><h3>Barbers</h3>${S.barbers.map(b=>`<div class="row"><span>${b.n}</span><button class="btn s ${b.s=="off"?"g":""}" onclick="act('brk',{n:'${b.n}',s:'${b.s=="off"?"free":"off"}'})">${b.s=="off"?"OFF":"ON"}</button></div>`).join("")}</div>
+<div class="card"><h3>${t("stats")}</h3><p>${t("served")}: ${s.served} · ${t("avgw")}: ${s.served||s.wsum?Math.round(s.wsum/Math.max(1,s.served)):0} ${t("min")} · ${t("ns")}: ${s.ns}</p><button class="btn s g" onclick="act('reset')">Reset demo</button></div>`}
+let last="";
+function render(){nav();const r=route(),[p,a]=[r.split("-")[0],r.split("-").slice(1).join("-")];
+ const h={home,join:joinV,status:()=>status(+a),reception,barber:()=>barber(a),display,admin}[p]||home;
+ document.getElementById("app").innerHTML=h();last=JSON.stringify(S)+lang+r}
+addEventListener("hashchange",()=>{msg="";render()});
+setInterval(pull,3000);pull();
+render();
+</script></body></html>
