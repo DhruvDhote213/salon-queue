@@ -19,10 +19,4 @@ Screens (hash routes): `#home`, `#join`, `#status-<id>`, `#reception`, `#barber-
 - Waiting time ~ minutes of services ahead / barbers working.
 - One active spot per phone number. Online joining can be closed; walk-ins still work.
 
-## Run locally
-```
-cd backend
-cp .env.example .env        # put your Supabase DATABASE_URL in .env
-npm install && npm start    # http://localhost:3000
-```
-Then open `frontend/index.html` in a browser. Screens poll the API every 3 seconds, so phone, tablet and TV stay in sync.
+
