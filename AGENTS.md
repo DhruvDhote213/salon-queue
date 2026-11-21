@@ -18,7 +18,6 @@ Queue app for a salon: customers join from their phone, see position and wait ti
 ## How to work
 - One screen or one feature per task. Don't touch other screens.
 - Theme: charcoal (#1F2937) + gold (#D4A017), rounded cards, mobile-first.
-- All labels go through the English/Gujarati dictionary in `index.html`; no hard-coded text in screens.
 - Queue rules live in ONE place: the `actions` object in `backend/server.js`. The frontend never changes queue state itself.
 - Never add features from the "Don't build" list in docs/01-brief.md.
 - Never commit `.env` or any database password.
