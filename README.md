@@ -4,7 +4,7 @@
 **Hosted on:** Vercel (frontend) + Render (backend) + Supabase (PostgreSQL)
 
 ## About
-Queue app for a salon: customers join from their phone, see position and estimated wait, and get called; reception and barbers manage the queue; a TV screen shows who is with which barber. English and Gujarati labels.
+Queue app for a salon: customers join from their phone, see position and estimated wait, and get called; reception and barbers manage the queue; a TV screen shows who is with which barber.
 
 ## Structure
 - `frontend/index.html` – all 7 screens (Vercel)
